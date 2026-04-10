@@ -6,19 +6,18 @@ import time
 ITERATION_LIMIT = 400
 
 def execute_loop_multi_select(ring=False):
-    """Compatibility wrapper for Blender 5.1+ and older versions"""
-    if hasattr(bpy.ops.mesh, "select_edge_ring_multi") and hasattr(bpy.ops.mesh, "select_edge_loop_multi"):
-        # Modern Blender 5.1+ API
+    try:
         if ring:
             bpy.ops.mesh.select_edge_ring_multi()
         else:
             bpy.ops.mesh.select_edge_loop_multi()
-    elif hasattr(bpy.ops.mesh, "loop_multi_select"):
-        # Blender 4.x and older
-        bpy.ops.mesh.loop_multi_select(ring=ring)
-    else:
-        # Fallback 
-        bpy.ops.mesh.loop_select(ring=ring)
+    except AttributeError:
+        # If Error, 4.x fall back to the old operator
+        try:
+            bpy.ops.mesh.loop_multi_select(ring=ring)
+        except AttributeError:
+            # fallback older
+            bpy.ops.mesh.loop_select(ring=ring)
 
 def select_face_loops(ring=False):
     execute_loop_multi_select(ring=ring)
